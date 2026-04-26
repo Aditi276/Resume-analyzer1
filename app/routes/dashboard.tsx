@@ -1,47 +1,59 @@
-import { useState } from "react";
-import { FaHome, FaFileUpload } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaFileUpload } from "react-icons/fa";
 import { useNavigate } from "react-router";
+import Navbar from "~/components/Navbar";
 
 export default function Dashboard() {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
   const navigate = useNavigate();
 
   const [file, setFile] = useState<File | null>(null);
   const [role, setRole] = useState("");
   const [jd, setJd] = useState("");
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("isLoggedIn") !== "true") {
+      navigate("/");
+    }
+  }, [navigate]);
+
   const handleSubmit = async () => {
-    if (!file || !role || !jd) {
-      alert("Please upload resume, select role and add job description");
+    if (!file || !role) {
+      alert("Please upload resume and select role");
       return;
     }
 
     const formData = new FormData();
     formData.append("resume", file);
     formData.append("role", role);
-    formData.append("job_description", jd);
+    formData.append("jobDescription", jd);
 
-    const res = await fetch("http://127.0.0.1:5000/analyze", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch(`${API_BASE_URL}/analyze`, {
+        method: "POST",
+        body: formData,
+      });
 
-    const data = await res.json();
-    navigate("/result", { state: data });
+      const data = await res.json();
+
+      if (data.success) {
+        navigate("/result", { state: data.data });
+      } else {
+        alert(data.error || "Something went wrong");
+      }
+
+    } catch (err) {
+      console.error("Request failed:", err);
+      alert("Server not reachable");
+    }
   };
 
   return (
-    <main className="min-h-screen bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat">
-      
-      {/* Home Icon */}
-      <div className="p-6">
-        <FaHome
-          onClick={() => navigate("/")}
-          className="text-3xl cursor-pointer text-black hover:text-blue-600"
-        />
-      </div>
-
-      <section className="flex justify-center items-center px-4">
-        <div className="w-full max-w-3xl bg-white bg-opacity-85 rounded-xl shadow-xl p-8">
+    <main className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-100 to-indigo-200 bg-cover bg-center bg-no-repeat">
+      <Navbar />
+      <section className="flex justify-center items-center px-4 py-8">
+        <div className="w-full max-w-3xl bg-white/90 rounded-xl shadow-xl p-8">
 
           {/* Heading */}
           <div className="text-center mb-8">
@@ -64,6 +76,7 @@ export default function Dashboard() {
               <option value="">Select role</option>
               <option value="frontend">Frontend Developer</option>
               <option value="backend">Backend Developer</option>
+              <option value="fullstack">Fullstack Developer</option>
               <option value="cloud">Cloud / DevOps</option>
               <option value="data">Data Analyst</option>
             </select>
@@ -77,7 +90,7 @@ export default function Dashboard() {
               className="w-full border rounded-md p-2"
               value={jd}
               onChange={(e) => setJd(e.target.value)}
-              placeholder="Paste job description here"
+              placeholder="Paste job description here (optional)"
             />
           </div>
 
