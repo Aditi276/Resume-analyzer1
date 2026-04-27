@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { FaChalkboardTeacher, FaFileAlt } from "react-icons/fa";
+import { FaChalkboardTeacher, FaFileAlt, FaListUl } from "react-icons/fa";
 import Navbar from "~/components/Navbar";
 
 export default function Hub() {
@@ -50,6 +50,21 @@ export default function Hub() {
               with your own content, timers, or a question bank.
             </p>
             <span className="font-semibold text-emerald-700 group-hover:underline">Open interview prep →</span>
+          </Link>
+
+          <Link
+            to="/curated-lists"
+            className="group flex flex-col rounded-2xl border-2 border-white/80 bg-white/95 p-8 shadow-lg transition hover:border-violet-300 hover:shadow-xl"
+          >
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-violet-100 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
+              <FaListUl className="text-2xl" />
+            </div>
+            <h2 className="mb-2 text-xl font-bold text-slate-900">Topic-wise curated lists</h2>
+            <p className="mb-6 flex-1 text-sm text-slate-600">
+              Practice structured DSA sets by topic instead of random links. Start with Arrays, Trees, and
+              Graphs lists curated for backend interview prep.
+            </p>
+            <span className="font-semibold text-violet-700 group-hover:underline">Open curated lists →</span>
           </Link>
         </div>
       </section>
